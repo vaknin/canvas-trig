@@ -1,12 +1,19 @@
-//#region Canvas Initialization
+//Canvas Initialization
 const canvas:HTMLCanvasElement = document.querySelector('#canvas');
-//canvas.width = window.innerWidth;//3840//window.innerWidth;
-canvas.width = 3840
-//canvas.height = window.innerHeight//1080//window.innerHeight;
-canvas.height = 1080
 const ctx = canvas.getContext('2d');
-//#endregion
 
+// Enter your screen's width here
+canvas.width = 3840;
+
+// Enter your screen's height here
+canvas.height = 1080;
+
+// Sine Properties - play with these, or even better - randomize their values using rand()
+let frequency = Math.PI*20;
+let amplitude = Math.PI*28;
+let iterations = 14;
+
+// A simple vector2 class
 class Point {
     x: number;
     y: number;
@@ -16,15 +23,13 @@ class Point {
     }
 }
 
+// Generates a random number between 'min' and 'max'
 const rand = (min:number, max:number) => {
     return Math.random() * (max-min) + min
 }
 
-const calculate_distance = (p1:Point, p2:Point) => {
-    return Math.sqrt(Math.pow(p1.x-p2.x,2)+Math.pow(p1.y-p2.y,2))
-}
-
-const draw_background = (color:string) => {
+// The canvas' background fill function, default is white
+const draw_background = (color:string='white') => {
     ctx.beginPath();
     ctx.rect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = color;
@@ -32,36 +37,40 @@ const draw_background = (color:string) => {
     ctx.closePath();
 }
 
+// This is the function where all the magic happens
 const draw_sine = (y_baseline, frequency, amplitude) => {
     let x = 0
     ctx.beginPath()
     ctx.moveTo(x, y_baseline);
 
+    // The sine loop
     while (x < canvas.width){
+        // The sine (you can experiment with this and change to 'cos' or 'tan' or whatever you feel like)
         let y = y_baseline + (amplitude * Math.sin(x/frequency));
         ctx.lineTo(x, y);
         x++;
     }
 
-    // fill
-    const color1 = rand(65, 72);
-    const color2 = rand(65, 72);
-    const color3 = rand(65, 72);
-    ctx.fillStyle = `rgb(${color1},${color2},${color3})`;
-    ctx.fill();
+    // Fill
+    // const color1 = rand(140, 190);
+    // const color2 = rand(140, 190);
+    // const color3 = rand(140, 190);
+    // ctx.fillStyle = `rgb(${color1},${color2},${color3})`;
+    // ctx.fill();
 
-    // stroke black
+    // Edges - change width and color as you'd like
     ctx.strokeStyle = '#444'
     ctx.lineWidth = 27;
     ctx.stroke();
 
-    // stroke white
+    // Body - change width and color as you'd like
     ctx.strokeStyle = '#ddd'
     ctx.lineWidth = 20;
     ctx.stroke();
     ctx.closePath();
 }
 
+// Downloads the image to a png file, useful for animating images and downloading in bulk
 const download_canvas = () => {
     var dataURL = canvas.toDataURL("image/png"); 
     var downloadLink = document.createElement('a');
@@ -72,48 +81,25 @@ const download_canvas = () => {
     document.body.removeChild(downloadLink);
 }
 
-
+// Draws the sine function(s) into the canvas
 const draw = () => {
-    draw_background('#fff');
-    let frequency = 135.5//410//rand(100,93);
-    let amplitude = Math.PI*160//rand(20,30);
+    draw_background();
     
-    for (let i = 0; i < 33; i++) {
-        const y_baseline = canvas.height * 0.5//rand(0.5,0.5);
+    for (let i = 0; i < iterations; i++) {
+        const y_baseline = canvas.height * 0.5;
         draw_sine(y_baseline, frequency, amplitude);
-        frequency+=0
-        amplitude-=18
+        
+        // Play with the following two lines to increase/decrease image noise and randomness
+        frequency+=0.6
+        amplitude-=15
     }
-    download_canvas()
 
+    // Uncomment to download programatically
+    //download_canvas()
+
+    // Animate (i.e. move to the next frame)
     //requestAnimationFrame(draw);
 }
 
-document.addEventListener('keypress', e => {
-
-    if (['w','s','d','a'].includes(e.key)){
-        // if (e.key == 'w'){
-        //     amplitude += 30;
-        // }
-
-        // else if (e.key == 's'){
-        //     amplitude -= 30;
-        // }
-
-        else if (e.key == 'd'){
-            frequency += 30;
-        }
-
-        else if (e.key == 'a'){
-            frequency -= 30;
-        }
-        //draw_background('rgb(0,0,25)');
-        draw_background('#fff');
-        draw()        
-    }
-})
-
+// Main
 requestAnimationFrame(draw)
-
-//draw_background('rgb(0,0,25)');
-//draw()
