@@ -3,3 +3,24 @@ html, body {
     padding: 0;
     height: 100vh;
 }
+
+form {
+    text-align-last: center;
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    align-items: center;
+    border: 1px solid black;
+}
+
+form div{
+    margin: 0.2rem;
+    padding: 0.2rem;
+    display: flex;
+    justify-content: center;
+}
