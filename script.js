@@ -9,17 +9,20 @@ canvas.width = 3840;
 canvas.height = 1080;
 
 // Sine Properties - play with these, or even better - randomize their values using rand()
-let frequency = 50;
-let amplitude = 120;
-let iterations = 4;
-let frequency_modifier = -1;
-let amplitude_modifier = -3;
-let fillColor = "#aafa0a";
-let bodyColor = "#000";
-let edgeColor = "#000";
-let backgroundColor = "#000";
-let edgeWidth = 2;
-let bodyWidth = 3;
+let frequency = 1;
+let amplitude = 0;
+let iterations = 1;
+let frequency_modifier = 0;
+let amplitude_modifier = 0;
+let fillColor = "#ADD8E6";
+let bodyColor = "#ffffff";
+let edgeColor = "#000000";
+let backgroundColor = "#000000";
+let bodyWidth = 1;
+let edgeWidth = 1;
+let enableDrawStars = false;
+let enableEdgeColor = false;
+let enableFillColor = false;
 
 // A simple vector2 class
 class Point {
@@ -80,26 +83,97 @@ const createMenu = () => {
         form.appendChild(colorDiv);
     }
 
+    const createCheckBox = (value, name, onChange) => {
+
+        let input = document.createElement("input");
+        input.id = name;
+        input.type = "checkbox";
+        input.value = value;
+        input.onchange = onChange;
+        if (name == "StarsCheckbox"){
+            let div = document.createElement("div");
+            div.id = "StarsDiv"
+            let label = document.createElement("label");
+            label.innerText = "Stars";
+            div.append(label, input);
+            return div;
+        }
+        return input;
+    }
+
+    const createResolutionInputs = () => {
+
+        let parentDiv = document.createElement("div");
+        parentDiv.id = "parentDiv";
+        let widthInput = document.createElement("input");
+        widthInput.type = "number";
+        let heightInput = document.createElement("input");
+        heightInput.type = "number";
+        widthInput.value = canvas.width;
+        heightInput.value = canvas.height;
+        widthInput.onchange = e => {canvas.width = Number.parseInt(e.target.value)};
+        heightInput.onchange = e => {canvas.height = Number.parseInt(e.target.value)};
+
+        let widthLabel = document.createElement("label");
+        widthLabel.innerText = "Screen Width";
+        let heightLabel = document.createElement("label");
+        heightLabel.innerText = "Screen Height";
+
+        let wDiv = document.createElement("div");
+        let hDiv = document.createElement("div");
+
+        wDiv.append(widthLabel, widthInput);
+        hDiv.append(heightLabel, heightInput);
+        parentDiv.append(wDiv, hDiv);
+
+        form.append(parentDiv);
+    }
+
+    // Create the form
     document.body.appendChild(form);
-    
+    createResolutionInputs();
+
+    // Frequency
     createNumberInput(1, frequency.toFixed(1), "Frequency", e => { frequency = Number.parseFloat(e.target.value)});
     createNumberInput(1, frequency_modifier.toFixed(1), "Frequency Modifier", e => {frequency_modifier = Number.parseFloat(e.target.value)});
-
+    
+    // Amplitude
     createNumberInput(5, amplitude.toFixed(1), "Amplitude", e => { amplitude = Number.parseFloat(e.target.value)});
     createNumberInput(1, amplitude_modifier.toFixed(1), "Amplitude Modifier", e => {amplitude_modifier = Number.parseFloat(e.target.value)});
 
+    // Iterations
     createNumberInput(1, iterations.toFixed(0), "Iterations", e => {iterations = Number.parseInt(e.target.value)});
     
-    createNumberInput(1, bodyWidth.toFixed(0), "Body", e => {bodyWidth = Number.parseInt(e.target.value)});
+    // Body
+    createNumberInput(1, bodyWidth.toFixed(1), "Body", e => {bodyWidth = Number.parseFloat(e.target.value)});
     createColorInput(bodyColor, "Body", e => { bodyColor = e.target.value});
     document.querySelector('#BodyDiv').appendChild(document.querySelector('#BodyColorDiv'));
 
-    createNumberInput(1, edgeWidth.toFixed(0), "Edge", e => {edgeWidth = Number.parseInt(e.target.value)});
+    // Edge
+    createNumberInput(1, edgeWidth.toFixed(1), "Edge", e => {edgeWidth = Number.parseFloat(e.target.value)});
     createColorInput(edgeColor, "Edge", e => { edgeColor = e.target.value});
     document.querySelector('#EdgeDiv').appendChild(document.querySelector('#EdgeColorDiv'));
+    document.querySelector('#EdgeDiv').appendChild(createCheckBox(enableEdgeColor, "EdgeCheckbox" ,e => {enableEdgeColor = e.target.checked}));
 
+    let etcDiv = document.createElement("div");
+    etcDiv.id = "etcDiv";
+    
+    // Stars
+    etcDiv.appendChild(createCheckBox(enableDrawStars, "StarsCheckbox", e => {enableDrawStars = e.target.checked}));
+
+    form.appendChild(etcDiv);
+
+    // Fill
     createColorInput(fillColor, "Fill", e => { fillColor = e.target.value});
+    etcDiv.appendChild(document.querySelector('#FillColorDiv'));
+    etcDiv.appendChild(createCheckBox(enableFillColor, "FillCheckbox", e => {enableFillColor = e.target.checked}));
+    document.querySelector('#FillColorDiv').appendChild(document.querySelector('#FillCheckbox'));
+
+    // BG Color
     createColorInput(backgroundColor, "Background", e => { backgroundColor = e.target.value});
+    etcDiv.appendChild(document.querySelector('#BackgroundColorDiv'));
+
+
 
     let btn = document.createElement("button");
     btn.innerText = "Render";
@@ -120,7 +194,7 @@ const revertToInputValues = () => {
 const draw_background = () => {
     ctx.beginPath();
     ctx.rect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = backgroundColor;
+    ctx.fillStyle = enableDrawStars? "black" : backgroundColor;
     ctx.fill();
     ctx.closePath();
 }
@@ -141,18 +215,19 @@ const draw_sine = (y_baseline, frequency, amplitude) => {
     }
 
     // Fill
-    ctx.fillStyle = fillColor;
-    // const color2 = rand(140, 190);
-    // const color3 = rand(140, 190);
-    // ctx.fillStyle = `rgb(${color1},${color2},${color3})`;
-    ctx.fill();
+    if (enableFillColor){
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+    }
 
-    // Edges - change width and color as you'd like
-    ctx.strokeStyle = edgeColor;
-    ctx.lineWidth = edgeWidth;
-    ctx.stroke();
+    // Edges
+    if (enableEdgeColor){
+        ctx.strokeStyle = edgeColor;
+        ctx.lineWidth = edgeWidth;
+        ctx.stroke();
+    }
 
-    // Body - change width and color as you'd like
+    // Body
     ctx.strokeStyle = bodyColor;
     ctx.lineWidth = bodyWidth;
     ctx.stroke();
@@ -161,7 +236,6 @@ const draw_sine = (y_baseline, frequency, amplitude) => {
 
 const draw_space = () => {
 
-    draw_background("#000");
     const draw_stars = (amount, size, color="#fff") => {
 
         for (let i = 0; i < amount; i++) {
@@ -182,8 +256,12 @@ const draw_space = () => {
     
 // Draws the sine function(s) into the canvas
 const draw = () => {
+
     draw_background();
-    draw_space();
+
+    if (enableDrawStars){
+        draw_space();
+    }
     
     for (let i = 0; i < iterations; i++) {
         const y_baseline = canvas.height * 0.5;

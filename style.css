@@ -7,20 +7,52 @@ html, body {
 form {
     text-align-last: center;
     position: fixed;
-    top: 2rem;
-    left: 2rem;
+    top: 1rem;
+    left: 1rem;
     background-color: #ffffff;
     border-radius: 0.5rem;
     display: flex;
     flex-direction: column;
-    padding: 1rem;
+    padding: 0.25rem;
     align-items: center;
     border: 1px solid black;
 }
 
 form div{
     margin: 0.2rem;
-    padding: 0.2rem;
+    padding: 0.1rem 1rem;
     display: flex;
-    justify-content: center;
+    align-items: center;
+    align-self: baseline;
+}
+
+form div * {
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+}
+
+#parentDiv div{
+    flex-direction: column;
+}
+
+#etcDiv {
+    flex-direction: column;
+}
+
+#etcDiv div * {
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+
+}
+
+#etcDiv label {
+    order: 2;
+}
+
+#etcDiv input {
+    order: 3;
+}
+
+#etcDiv input[type="checkbox"] {
+    order: 1;
 }
